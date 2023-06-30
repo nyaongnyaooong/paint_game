@@ -7,6 +7,7 @@
     "start": "pm2 start app",
     "dev": "nodemon app",
     "build": "npx tsc",
+    "scss": "sass --watch ./reactapp/src/css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

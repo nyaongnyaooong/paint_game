@@ -1,0 +1,14 @@
+* {
+  box-sizing: border-box;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+}
+.login .inputArea {
+  display: flex;
+  flex-direction: column;
+}
+
+/*# sourceMappingURL=app.css.map */

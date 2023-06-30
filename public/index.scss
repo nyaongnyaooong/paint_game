@@ -1,0 +1,23 @@
+* {
+  box-sizing: border-box;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+
+  .inputArea {
+    display: flex;
+    flex-direction: column;
+
+    span {
+      // color: aqua;
+    }
+
+    input {}
+  }
+
+  .buttonArea {
+    button {}
+  }
+}

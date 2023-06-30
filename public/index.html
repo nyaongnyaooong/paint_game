@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link type="text/css" rel="stylesheet" href="index.css" />
+</head>
+
+<body>
+
+  <form class="login" method="get" action="/setname">
+    <div class="inputArea">
+      <span>닉네임을 입력해주세요</span>
+      <input name="nickName">
+    </div>
+
+    <div class="buttonArea">
+      <button class="btn_start">게임 시작</button>
+    </div>
+  </form>
+
+</body>
+
+</html>
+
+<script>
+  const host = window.location.host;
+  const webSocket = new WebSocket("ws://" + host);
+
+  document.getElementsByClassName("btn_start").onclick = () => {
+    
+  }
+
+  webSocket.onopen = () => {
+    console.log("웹소켓서버와 연결 성공");
+  };
+
+  webSocket.onclose = function () {
+    console.log("서버 웹소켓 연결 종료");
+  }
+
+  webSocket.onerror = (event) => {
+    console.log(event)
+  }
+
+  // if (webSocket.readyState === webSocket.OPEN) {
+  //   webSocket.send()
+  // } else {
+  //   alert("서버와 연결하지 못하였습니다");
+  // }
+
+  // 3-2) 웹소켓 서버와 연결 끊기
+  document.getElementById("btn_close").onclick = function () {
+
+    if (webSocket.readyState === webSocket.OPEN) { // 연결 상태 확인
+      webSocket.close(); // 연결 종료
+
+    } else {
+      alert("연결된 웹소켓 서버가 없습니다.");
+    }
+  }
+
+</script>
