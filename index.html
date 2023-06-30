@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body style="background-color: aquamarine;">
+  <canvas id="jsCanvas" class="canvas" style="width: 700px; height: 700px; background-color: white;">
+
+  </canvas>
+
+  <script>
+    const canvas = document.getElementById('jsCanvas');
+    console.log(canvas)
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = 700;
+    canvas.height = 700;
+
+    let painting = false;
+
+    const stopPainting = () => {
+      painting = false;
+      console.log('stop')
+    }
+
+    const startPainting = (e) => {
+      
+      painting = true;
+      console.log('stop')
+    }
+
+    const onMouseMove = (e) => {
+      console.log(e)
+
+      const x = e.offsetX;
+      const y = e.offsetY;
+
+      if(!painting) {
+        ctx.beginPath();  // 출발점 초기화
+        ctx.moveTo(x, y)  //출발점을 좌표로 옮김
+      } else {
+        ctx.lineTo(x, y)  //도착점을 좌표로 옮김
+        ctx.stroke()  //그림
+      }
+    }
+
+    if (canvas) {
+      canvas.addEventListener('mousemove', onMouseMove)
+      canvas.addEventListener('mousedown', startPainting)
+      canvas.addEventListener('mouseup', stopPainting)
+      canvas.addEventListener('mouseleave', stopPainting)
+    }
+  </script>
+</body>
+
+</html>
