@@ -3,13 +3,19 @@ import './css/app.css';
 
 function App() {
 
+  // States
   const [ws, setWs] = useState(null);
   const [page, setPage] = useState('lobby');
   const [history, setHistory] = useState([]);
   const [userName, setUserName] = useState('');
+  const [location, setLocation] = useState('lobby');
   const [roomList, setRoomList] = useState([]);
+  const [master, setMaster] = useState(false);
+
+  // Ref
   const refCanvas = useRef(null);
 
+  // State Functions
   const appStateSet = {
     setWs,
     setPage,
@@ -22,12 +28,12 @@ function App() {
 
     const [html, setHtml] = useState([])
 
-    const enterRoom = (idx) => {
+    const enterRoom = (id) => {
       ws.send(JSON.stringify({
         name: userName,
         location: 'lobby',
         request: 'locate',
-        data: idx
+        data: id
       }))
     }
 
@@ -36,10 +42,10 @@ function App() {
         console.log(roomList)
         const arr = []
         roomList.forEach((e, i) => {
-          const { roomId, roomIdx, roomMember, roomMaster } = e
+          const { roomId, roomMember, roomMaster } = e
 
           arr.push(
-            <tr key={i} onClick={() => enterRoom(roomIdx)}>
+            <tr key={i} onClick={() => enterRoom(roomId)}>
               <td>{roomId}</td>
               <td>방</td>
               <td>{roomMaster.name}</td>
@@ -56,6 +62,7 @@ function App() {
     useEffect(() => {
 
       const getRoomList = setInterval(() => {
+        console.log(ws)
         if (ws.readyState === ws.OPEN) {
           console.log('방정보 요청');
           ws.send(JSON.stringify({
@@ -114,7 +121,7 @@ function App() {
 
 
   const Room = (props) => {
-    const { appStateSet, ws, refCanvas, history } = props;
+    const { appStateSet, ws, refCanvas, history, master } = props;
     const { setPage } = appStateSet;
 
     // Canvas 요소에 접근하기 위한 Ref 생성
@@ -178,7 +185,7 @@ function App() {
 
       ws.send(JSON.stringify({
         name: userName,
-        location: false,
+        location,
         request: 'draw',
         data: {
           prevX,
@@ -198,6 +205,7 @@ function App() {
     // 마우스를 클릭할 때 호출되는 이벤트 핸들러
     const handleMouseDown = (e) => {
       if (ws.readyState !== ws.OPEN) return;
+
       // 그림 그리기 시작
       isDrawing = true;
       // 현재 마우스 위치를 이전 위치로 초기화
@@ -215,24 +223,69 @@ function App() {
     const exitRoom = () => {
       ws.send(JSON.stringify({
         name: userName,
-        location: false,
+        location,
         request: 'locate',
         data: 'lobby'
       }))
     }
 
+    const startGame = () => {
+      ws.send(JSON.stringify({
+        name: userName,
+        location,
+        request: 'startGame',
+        data: false
+      }))
+    }
+
     return (
-      <div>
-        <canvas
-          ref={refCanvas}
-          width={500}   // Canvas 너비
-          height={500}  // Canvas 높이
-          style={{ border: '1px solid black' }}
-          onMouseMove={handleMouseMove}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-        />
-        <button onClick={exitRoom}>나가기</button>
+      <div className='room'>
+        <div className='userArea1'>
+          <div className='user'>
+
+          </div>
+          <div className='user'>
+
+          </div>
+          <div className='user'>
+
+          </div>
+        </div>
+        <div className='canvasArea'>
+          <div className='canvasWrap'>
+            <canvas
+              ref={refCanvas}
+              width={500}
+              height={500}
+              onMouseMove={handleMouseMove}
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
+            />
+          </div>
+          <div className='controlArea'>
+            <button onClick={exitRoom}>나가기</button>
+            {
+              master
+                ? <button onClick={startGame}>시작하기</button>
+                : <></>
+            }
+          </div>
+
+        </div>
+        <div className='userArea2'>
+          <div className='user'>
+
+          </div>
+          <div className='user'>
+
+          </div>
+          <div className='user'>
+
+          </div>
+        </div>
+
+
+
       </div>
 
     );
@@ -282,7 +335,8 @@ function App() {
 
     // websocket
     // const host = window.location.host;
-    const webSocket = new WebSocket("ws://localhost:8080");
+
+    const webSocket = new WebSocket('ws://' + window.location.hostname + ':8080');
 
     // 2. 웹소켓 이벤트 처리
     // 2-1) 연결 이벤트 처리
@@ -309,43 +363,46 @@ function App() {
     // 메세지 수신
     webSocket.onmessage = (res) => {
       const serverMsg = JSON.parse(res.data);
+      const { response, message } = serverMsg;
 
-      if (serverMsg.response === 'error') {
+      if (response === 'error') {
         if (serverMsg.message === 'duplicated name') {
           alert('중복된 닉네임입니다!\n다른 닉네임을 입력해주세요')
           window.location.href = '/setname';
+        } else if (message === 'room does not exist') {
+          alert('존재하지 않는 방입니다')
         }
       }
 
-      if (serverMsg.response === 'roomList') {
-        const r = serverMsg.message
-
-
-        setRoomList(r)
+      if (response === 'roomList') {
+        setRoomList(message)
       }
 
-      if (serverMsg.response === 'enter') {
+      if (response === 'enter') {
 
-        if (serverMsg.message === 'lobby') {
+        if (message === 'lobby') {
           setPage('lobby');
         } else {
-          const { roomId, roomIdx, roomMember, roomMaster, history: his } = serverMsg.message
+          const { roomId, roomMember, roomMaster, history } = message
 
-          if (his) setHistory(his)
+          if (history) setHistory(history)
           else setHistory([])
+
+          setMaster(roomMaster === userName ? true : false)
+          setLocation(roomId)
 
           setPage('room')
         }
 
       }
 
-      if (serverMsg.response === 'draw') {
+      if (response === 'draw') {
         const $canvas = refCanvas.current;
         const context = $canvas.getContext('2d');
         // context.strokeStyle = 'red';
         // context.clearRect(0, 0, $canvas.width, $canvas.height);
 
-        const { prevX, prevY, x, y } = serverMsg.message
+        const { prevX, prevY, x, y } = message
 
         context.beginPath();
         context.moveTo(prevX, prevY);
@@ -354,12 +411,11 @@ function App() {
       }
 
     }
-    console.log(webSocket)
 
   }, []);
 
 
-  if (page === 'room') return <Room appStateSet={appStateSet} ws={ws} refCanvas={refCanvas} history={history} />
+  if (page === 'room') return <Room appStateSet={appStateSet} ws={ws} refCanvas={refCanvas} history={history} master={master} />
 
   return (
     <div>

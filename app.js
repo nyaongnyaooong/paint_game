@@ -167,7 +167,6 @@ webSocketServer.on('connection', (ws, req) => {
     if (clientMsg.request === 'createRoom') {
       gRooms.push({
         roomId: ++roomNumber,
-        roomIdx: gRooms.length,
         roomMember: [ws.name],
         roomMaster: ws.name,
         history: []
@@ -177,43 +176,71 @@ webSocketServer.on('connection', (ws, req) => {
         response: 'enter',
         message: {
           roomId: roomNumber,
-          roomIdx: gRooms.length - 1,
           roomMember: [ws.name],
           roomMaster: ws.name
         },
       }));
 
-      ws.state = gRooms.length - 1
+      ws.state = roomNumber;
     }
 
-    // 방 입장을 요청
-    if (clientMsg.request === 'locate') {
-      if(clientMsg.data === 'lobby') {
+    // 방 입장/퇴장 요청
+    if (clientMsg.request === 'locate') {   //퇴장
+      if (clientMsg.data === 'lobby') {
+        // 퇴실하기 전 방의 index
+        const idx = gRooms.findIndex(e => e.roomId === clientMsg.location)
+
+        // 멤버중 본인 삭제 / 자신 혼자면 방 삭제
+        if (gRooms[idx].roomMember.length === 1) gRooms.splice(idx, 1)
+        else gRooms[idx].roomMember.splice(gRooms[idx].roomMember.findIndex(e => e === ws.name), 1);
+
+        // 방 퇴실
         ws.send(JSON.stringify({
           response: 'enter',
           message: 'lobby',
         }));
 
+        // location 저장
         ws.state = 'lobby';
-      } else {
-        gRooms[clientMsg.data].roomMember.push(ws.name)
+      } else {    //입장
+        // 입장 요청한 방의 index값을 배열에서 찾음
+        const idx = gRooms.findIndex(e => e.roomId === clientMsg.data)
 
-        ws.send(JSON.stringify({
-          response: 'enter',
-          message: {
-            ...gRooms[clientMsg.data]
-          },
-        }));
-  
-        ws.state = gRooms.length - 1
+        // 방 클릭하기 직전 방이 사라졌을 경우
+        if (idx === -1) {
+          // 방 입장 허가
+          ws.send(JSON.stringify({
+            response: 'error',
+            message: 'room does not exist',
+          }));
+        } else {
+          // 방 멤버에 추가
+          gRooms[idx].roomMember.push(ws.name)
+
+          // 방 입장 허가
+          ws.send(JSON.stringify({
+            response: 'enter',
+            message: {
+              ...gRooms[idx]
+            },
+          }));
+
+          // location 저장
+          ws.state = gRooms[idx].id
+
+          gRooms[idx].roomMember
+        }
       }
 
     }
 
     // 그림을 그림
     if (clientMsg.request === 'draw') {
-      // console.log(gRooms[ws.state])
-      gRooms[ws.state].roomMember.forEach(e => {
+      // 입장 중인 방의 index
+      const idx = gRooms.findIndex(e => e.roomId === clientMsg.location)
+
+      // 자신을 제외한 모든 멤버에서 그리기 데이터 전송
+      gRooms[idx].roomMember.forEach(e => {
         if (e !== ws.name) {
           gUsers[e].send(JSON.stringify({
             response: 'draw',
@@ -224,7 +251,8 @@ webSocketServer.on('connection', (ws, req) => {
         }
       })
 
-      gRooms[ws.state].history.push({ ...clientMsg.data });
+      // 방 히스토리 추가
+      gRooms[idx].history.push({ ...clientMsg.data });
     }
 
 
@@ -243,6 +271,6 @@ webSocketServer.on('connection', (ws, req) => {
   })
 
   ws.on('close', () => {
-    console.log(`클라이언트[${ip}] 웹소켓 연결 종료`);
+    delete gUsers[ws.name];
   })
 });

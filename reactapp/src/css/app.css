@@ -1,9 +1,39 @@
-.App {
+.app {
   text-align: center;
 }
 
 .canvas_wrap {
   background-color: black;
+}
+
+.room {
+  display: flex;
+}
+.room .user {
+  width: 300px;
+  height: 200px;
+  border: 1px solid black;
+}
+.room .userArea1 {
+  flex: 1;
+}
+.room .canvasArea {
+  display: flex;
+  flex-direction: column;
+  flex: 3;
+}
+.room .canvasArea .canvasWrap {
+  text-align: center;
+}
+.room .canvasArea .canvasWrap canvas {
+  border: 1px solid black;
+  background-color: white;
+}
+.room .canvasArea .controlArea button {
+  background-color: aqua;
+}
+.room .userArea2 {
+  flex: 1;
 }
 
 /*# sourceMappingURL=app.css.map */

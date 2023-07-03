@@ -1,7 +1,48 @@
-.App {
+.app {
   text-align: center;
 }
 
 .canvas_wrap {
   background-color: black;
+}
+
+.room {
+  display: flex;
+  .user {
+    width: 300px;
+    height: 200px;
+    border: 1px solid black;
+  }
+
+  .userArea1 {
+    flex: 1;
+    // 
+  }
+
+  .canvasArea {
+    display: flex;
+    flex-direction: column;
+    flex: 3;
+
+    .canvasWrap {
+      text-align: center;
+
+      canvas {
+        border: 1px solid black;
+        background-color: white;
+      }
+    }
+
+    .controlArea {
+      button {
+        background-color: aqua;
+      }
+    }
+  }
+
+  .userArea2 {
+    flex: 1;
+    // 
+  }
+
 }
