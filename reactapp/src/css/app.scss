@@ -1,23 +1,7 @@
-* {
-  box-sizing: border-box;
+.App {
+  text-align: center;
 }
 
-.login {
-  display: flex;
-  flex-direction: column;
-
-  .inputArea {
-    display: flex;
-    flex-direction: column;
-
-    span {
-      // color: aqua;
-    }
-
-    input {}
-  }
-
-  .buttonArea {
-    button {}
-  }
+.canvas_wrap {
+  background-color: black;
 }

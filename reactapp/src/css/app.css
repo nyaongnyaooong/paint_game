@@ -1,14 +1,9 @@
-* {
-  box-sizing: border-box;
+.App {
+  text-align: center;
 }
 
-.login {
-  display: flex;
-  flex-direction: column;
-}
-.login .inputArea {
-  display: flex;
-  flex-direction: column;
+.canvas_wrap {
+  background-color: black;
 }
 
 /*# sourceMappingURL=app.css.map */

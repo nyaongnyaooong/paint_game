@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>웹소켓</title>
+  <link type="text/css" rel="stylesheet" href="../css/room.css" />
 </head>
 
 <body style="background-color: aquamarine;">
@@ -23,14 +24,11 @@
   const host = window.location.host;
   const webSocket = new WebSocket("ws://" + host);
 
-
   // 2. 웹소켓 이벤트 처리
   // 2-1) 연결 이벤트 처리
   webSocket.onopen = () => {
     console.log("웹소켓서버와 연결 성공");
   };
-
-
 
   // 2-3) 연결 종료 이벤트 처리
   webSocket.onclose = function () {

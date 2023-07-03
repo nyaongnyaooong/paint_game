@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>캐치마인드 - 방 입장하기</title>
+  <link type="text/css" rel="stylesheet" href="../css/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <div class="title">
+    <h1>캐치마인드</h1>
+    <h4></h4>
+  </div>
+  <div class="buttonArea">
+    <button onclick="changeName()">닉네임 변경하기</button>
+    <button onclick="createRoom()">방 만들기</button>
+  </div>
+
+  <div class="roomList">
+    <table>
+      <thead>
+        <th>
+        <td>번호</td>
+        <td>방제목</td>
+        <td>방장</td>
+        </th>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+  <!-- 버튼 2개 생성 -->
+  <button id="btn_close">연결 끊기</button>
+
+  <canvas id="jsCanvas" class="canvas" style="width: 700px; height: 700px; background-color: white;">
+
+  </canvas>
+</body>
+
+
+</html>
+
+<script src="../js/index.js"></script>
