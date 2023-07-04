@@ -64,9 +64,7 @@ function App() {
     useEffect(() => {
 
       const getRoomList = setInterval(() => {
-        console.log(ws)
         if (ws.readyState === ws.OPEN) {
-          console.log('방정보 요청');
           ws.send(JSON.stringify({
             name: userName,
             location: 'lobby',
@@ -373,7 +371,6 @@ function App() {
     // 2. 웹소켓 이벤트 처리
     // 2-1) 연결 이벤트 처리
     webSocket.onopen = () => {
-      console.log(userName)
       setWs(webSocket)
       webSocket.send(JSON.stringify({
         name: userName,
