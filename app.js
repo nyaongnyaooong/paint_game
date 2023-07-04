@@ -107,7 +107,10 @@ const HTTPServer = app.listen(app.get('httpPort'), () => {
 
 let count = 0;
 
-
+const game = () => {
+  let round = 1;
+  
+}
 
 // WebSocket 서버
 const webSocketServer = new wsModule.Server(
@@ -257,6 +260,7 @@ webSocketServer.on('connection', (ws, req) => {
 
     // 게임 시작
     if (clientMsg.request === 'startGame') {
+
       ws.send(JSON.stringify({
         response: 'roomList',
         message: gRooms

@@ -8,32 +8,54 @@
 
 .room {
   display: flex;
+  flex-direction: column;
 }
-.room .user {
+.room .viewArea {
+  display: flex;
+}
+.room .viewArea .user {
   width: 300px;
   height: 200px;
   border: 1px solid black;
 }
-.room .userArea1 {
+.room .viewArea .userArea1 {
   flex: 1;
 }
-.room .canvasArea {
+.room .viewArea .canvasArea {
   display: flex;
   flex-direction: column;
   flex: 3;
 }
-.room .canvasArea .canvasWrap {
+.room .viewArea .canvasArea .canvasWrap {
   text-align: center;
 }
-.room .canvasArea .canvasWrap canvas {
+.room .viewArea .canvasArea .canvasWrap canvas {
   border: 1px solid black;
   background-color: white;
 }
-.room .canvasArea .controlArea button {
+.room .viewArea .canvasArea .controlArea button {
   background-color: aqua;
 }
-.room .userArea2 {
+.room .viewArea .userArea2 {
   flex: 1;
+}
+.room .chatArea {
+  display: flex;
+  flex-direction: column;
+}
+.room .chatArea .chatView {
+  border: 1px solid black;
+  height: 100px;
+}
+.room .chatArea .chatInput {
+  display: flex;
+  border: 1px solid black;
+}
+.room .chatArea .chatInput .inputArea {
+  border: 1px solid crimson;
+}
+.room .chatArea .chatInput .buttonArea {
+  border: 1px solid crimson;
 }
 
 /*# sourceMappingURL=app.css.map */

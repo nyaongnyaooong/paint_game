@@ -11,6 +11,7 @@ function App() {
   const [location, setLocation] = useState('lobby');
   const [roomList, setRoomList] = useState([]);
   const [master, setMaster] = useState(false);
+  const [chatHistory, setChatHistory] = useState(false);
 
   // Ref
   const refCanvas = useRef(null);
@@ -19,7 +20,8 @@ function App() {
   const appStateSet = {
     setWs,
     setPage,
-    setUserName
+    setUserName,
+    setChatHistory
   }
 
   const Lobby = (props) => {
@@ -238,54 +240,84 @@ function App() {
       }))
     }
 
+    const sendChat = (event) => {
+      event.preventDefault();
+      const $input = event.target.chatContent;
+      const content = $input.value;
+      $input.focus();
+
+      event.target.chatContent.value = '';
+      console.log(content)
+      ws.send(JSON.stringify({
+        name: userName,
+        location,
+        request: 'chat',
+        data: false
+      }))
+    }
+
     return (
       <div className='room'>
-        <div className='userArea1'>
-          <div className='user'>
+
+        <div className='viewArea'>
+          <div className='userArea1'>
+            <div className='user'>
+
+            </div>
+            <div className='user'>
+
+            </div>
+            <div className='user'>
+
+            </div>
+          </div>
+          <div className='canvasArea'>
+            <div className='canvasWrap'>
+              <canvas
+                ref={refCanvas}
+                width={500}
+                height={500}
+                onMouseMove={handleMouseMove}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+              />
+            </div>
+            <div className='controlArea'>
+              <button onClick={exitRoom}>나가기</button>
+              {
+                master
+                  ? <button onClick={startGame}>시작하기</button>
+                  : <></>
+              }
+            </div>
 
           </div>
-          <div className='user'>
+          <div className='userArea2'>
+            <div className='user'>
 
-          </div>
-          <div className='user'>
+            </div>
+            <div className='user'>
 
+            </div>
+            <div className='user'>
+
+            </div>
           </div>
+
         </div>
-        <div className='canvasArea'>
-          <div className='canvasWrap'>
-            <canvas
-              ref={refCanvas}
-              width={500}
-              height={500}
-              onMouseMove={handleMouseMove}
-              onMouseDown={handleMouseDown}
-              onMouseUp={handleMouseUp}
-            />
-          </div>
-          <div className='controlArea'>
-            <button onClick={exitRoom}>나가기</button>
-            {
-              master
-                ? <button onClick={startGame}>시작하기</button>
-                : <></>
-            }
-          </div>
+        <div className='chatArea'>
+          <div className='chatView'>
 
+          </div>
+          <form className='chatInput' onSubmit={sendChat}>
+            <div className='inputArea'>
+              <input name='chatContent'></input>
+            </div>
+            <div className='buttonArea'>
+              <button>전송</button>
+            </div>
+          </form>
         </div>
-        <div className='userArea2'>
-          <div className='user'>
-
-          </div>
-          <div className='user'>
-
-          </div>
-          <div className='user'>
-
-          </div>
-        </div>
-
-
-
       </div>
 
     );
@@ -415,7 +447,7 @@ function App() {
   }, []);
 
 
-  if (page === 'room') return <Room appStateSet={appStateSet} ws={ws} refCanvas={refCanvas} history={history} master={master} />
+  if (page === 'room') return <Room appStateSet={appStateSet} ws={ws} refCanvas={refCanvas} history={history} master={master} chatHistory={chatHistory}/>
 
   return (
     <div>
