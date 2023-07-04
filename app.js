@@ -255,6 +255,13 @@ webSocketServer.on('connection', (ws, req) => {
       gRooms[idx].history.push({ ...clientMsg.data });
     }
 
+    // 게임 시작
+    if (clientMsg.request === 'startGame') {
+      ws.send(JSON.stringify({
+        response: 'roomList',
+        message: gRooms
+      }));
+    }
 
     // // buffer > string 변환
     // const a = msg.toString('utf8')
