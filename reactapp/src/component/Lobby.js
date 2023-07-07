@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
+
 const Lobby = (props) => {
   const { appStateSet, userName, ws, roomList } = props;
   const { setPage, setHistory, setLocation, setRoomList, setMaster, setRoomInfo } = appStateSet;
@@ -30,8 +31,9 @@ const Lobby = (props) => {
           </tr>
         )
       })
-
       setHtml(arr)
+    } else {
+      setHtml(<></>)
     }
   }, [roomList])
 
@@ -53,6 +55,7 @@ const Lobby = (props) => {
     ws.onmessage = (res) => {
       const serverMsg = JSON.parse(res.data);
       const { response, message } = serverMsg;
+      console.log(serverMsg)
 
       if (response === 'error') {
         if (serverMsg.message === 'duplicated name') {

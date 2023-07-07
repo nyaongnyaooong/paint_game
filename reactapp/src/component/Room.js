@@ -21,6 +21,7 @@ const Room = (props) => {
   // console.log(information.roomMember[0])
   // Canvas 요소에 접근하기 위한 Ref 생성
   const refCanvas = useRef(null);
+  const refAudio = useRef(null);
 
   // 그림 그리기에 필요한 변수들
   // let isDrawing = false;
@@ -118,6 +119,7 @@ const Room = (props) => {
       if (response === 'gameEnd') {
 
       }
+
     }
 
     // 타이머 표시용 interval
@@ -240,73 +242,80 @@ const Room = (props) => {
     const { player } = props;
     return player
       ? (
-        <div className='user'>
-          <span>{player}</span>
-          <span>{information?.correct[player] ? information.correct[player] : 0}</span>
+        <div className='userWrap'>
+          <div className='user'>
+            <span>{player}</span>
+            <span>{information?.correct[player] ? information.correct[player] : 0}</span>
+          </div>
         </div>
       )
       : (
-        <div className='user'>
+        <div className='userWrap'>
+          <div className='user'>
+          </div>
         </div>
       )
   }
 
   return (
     <div className='room'>
+      <div className='controlArea'>
+        <div className='logoArea'>
+          <div className='logo'></div>
+        </div>
+        <div className='buttonArea'>
+
+          {
+            information.roomMaster === userName
+              ? <button onClick={startGame}>시작하기</button>
+              : <></>
+          }
+          <button onClick={exitRoom}>나가기</button>
+        </div>
+        <div className='timeArea'>
+          {timerTime > nowTime
+            ? timerTime - nowTime
+            : 0
+          }
+        </div>
+
+
+        {
+          information?.game
+            ? <audio ref={refAudio} onLoadStart={() => { refAudio.current.volume = 0.4 }} autoPlay loop >
+              <source src="../bgm/walking.mp3"></source>
+            </audio>
+            : <></>
+        }
+      </div>
 
       <div className='viewArea'>
         <div className='userArea1'>
           <UserView player={information?.roomMember[0]} />
           <UserView player={information?.roomMember[1]} />
           <UserView player={information?.roomMember[2]} />
-          {/* <div className='user'>
-            <span>{information?.roomMember[0] ? information.roomMember[0] : <></>}</span>
-            <span>{information?.correct[information?.roomMember[0]] ? information.correct[information?.roomMember[0]] : 0}</span>
-          </div>
-          <div className='user'>
-            {information?.roomMember[1] ? information.roomMember[1] : <></>}
-          </div>
-          <div className='user'>
-            {information?.roomMember[2] ? information.roomMember[2] : <></>}
-          </div> */}
         </div>
         <div className='canvasArea'>
+          <div className='answerArea'>
+
+          </div>
           <div className='canvasWrap'>
             <canvas
               ref={refCanvas}
               width={450}
-              height={420}
+              height={350}
               onMouseMove={handleMouseMove}
               onMouseDown={handleMouseDown}
               onMouseUp={handleMouseUp}
               onMouseOut={handleMouseLeave}
-
             />
-          </div>
-          <div className='controlArea'>
-            <button onClick={exitRoom}>나가기</button>
-            {
-              information.roomMaster === userName
-                ? <button onClick={startGame}>시작하기</button>
-                : <></>
-            }
-            {timerTime > nowTime
-              ? timerTime - nowTime
-              : 0
-            }
           </div>
 
         </div>
         <div className='userArea2'>
-          <div className='user'>
-            {information.roomMember[3] ? information.roomMember[3] + information.correct[information.roomMember[3]] : <></>}
-          </div>
-          <div className='user'>
-            {information.roomMember[4] ? information.roomMember[4] : <></>}
-          </div>
-          <div className='user'>
-            {information.roomMember[5] ? information.roomMember[5] : <></>}
-          </div>
+          <UserView player={information?.roomMember[3]} />
+          <UserView player={information?.roomMember[4]} />
+          <UserView player={information?.roomMember[5]} />
         </div>
 
       </div>

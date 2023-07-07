@@ -87,9 +87,12 @@ app.get('test', (req, res) => {
   res.send('123')
 })
 
+app.set('trust proxy', true);
+
 // 404
 app.use((req, res, next) => {
-  res.sendFile(path.join(__dirname, '/public/html/404.html'));
+  console.log(new Date(), req.ip)
+  res.status(404).sendFile(path.join(__dirname, '/public/html/404.html'));
 });
 
 // 3000포트에서 http
@@ -115,6 +118,15 @@ const game = (roomId) => {
   // 게임 중임을 표기
   room.game = true;
 
+  room.roomMember.forEach(e => {
+    gUsers[e].send(JSON.stringify({
+      response: 'roomInfo',
+      message: {
+        game: true
+      }
+    }));
+  })
+
   // 라운드 설정
   // 이전 게임의 라운드를 불러오고 없으면 0라운드로 설정
   room.round = room.round + 1 || 0;
@@ -122,12 +134,14 @@ const game = (roomId) => {
   // 라운드가 끝났는지 판별
   if (room.round > 4) {
     room.game = false;
-    room.round = 0;
+    room.round = -1;
 
     room.roomMember.forEach(e => {
       gUsers[e].send(JSON.stringify({
-        response: 'gameEnd',
-        message: false
+        response: 'roomInfo',
+        message: {
+          game: false
+        }
       }));
     })
 
@@ -448,7 +462,14 @@ webSocketServer.on('connection', (ws, req) => {
     delete gUsers[ws.name];
 
     if (ws.location !== 'lobby') {
-      if (gRooms[ws.location].roomMember.length === 1) delete gRooms[ws.location]
+      const room = gRooms[ws.location];
+      if (room.roomMember.length === 1) delete gRooms[ws.location]
+      else {
+        const roomMemberIdx = room.roomMember.findIndex(e => e === ws.name);
+        room.roomMember.splice(roomMemberIdx, 1);
+      }
+      console.log(room)
+
     }
   })
 });

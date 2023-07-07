@@ -1,61 +1,166 @@
-.app {
-  text-align: center;
+* {
+  box-sizing: border-box;
 }
 
-.canvas_wrap {
-  background-color: black;
+.app {
+  text-align: center;
+  background-image: url("../img/bg_control.jpg");
+  background-size: auto;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
 }
 
 .room {
   display: flex;
   flex-direction: column;
+  background-image: url("../img/bg_control.jpg");
+  background-size: auto;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+.room .controlArea {
+  display: flex;
+  justify-content: center;
+  height: 70px;
+}
+.room .controlArea .logoArea {
+  display: flex;
+  justify-content: center;
+  width: 170px;
+  padding: 5px;
+}
+.room .controlArea .logoArea .logo {
+  width: 90px;
+  height: 100%;
+  background-image: url("../img/logo.png");
+  background-size: cover;
+}
+.room .controlArea .buttonArea {
+  display: flex;
+  width: 450px;
+  align-items: end;
+  justify-content: end;
+  background-color: #d6a8e9;
+}
+.room .controlArea .buttonArea button {
+  width: 80px;
+  height: 30px;
+  font-weight: 900;
+  margin: 1px;
+  border: 0px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.room .controlArea .timeArea {
+  background-color: aliceblue;
+  width: 170px;
 }
 .room .viewArea {
   display: flex;
+  justify-content: center;
 }
-.room .viewArea .user {
+.room .viewArea .userWrap {
   width: 150px;
-  height: 140px;
-  border: 1px solid black;
+  height: 100px;
+  border-radius: 15px;
+  background-color: midnightblue;
+  margin: 10px;
+  margin-top: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.room .viewArea .userArea1 {
-  flex: 1;
+.room .viewArea .userWrap .user {
+  width: 120px;
+  height: 80px;
+  background-color: white;
 }
 .room .viewArea .canvasArea {
   display: flex;
   flex-direction: column;
-  flex: 3;
+  align-items: center;
+}
+.room .viewArea .canvasArea .answerArea {
+  width: 450px;
+  height: 30px;
+  background-color: white;
+  opacity: 0.8;
+  border-radius: 5px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+  text-align: center;
+  vertical-align: middle;
 }
 .room .viewArea .canvasArea .canvasWrap {
   text-align: center;
 }
 .room .viewArea .canvasArea .canvasWrap canvas {
-  border: 1px solid black;
   background-color: white;
-}
-.room .viewArea .canvasArea .controlArea button {
-  background-color: aqua;
-}
-.room .viewArea .userArea2 {
-  flex: 1;
 }
 .room .chatArea {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  padding: 5px;
+  background-color: azure;
 }
 .room .chatArea .chatView {
-  border: 1px solid black;
+  width: 760px;
   height: 100px;
+  padding: 3px;
+  font-size: 14px;
+  overflow: scroll;
 }
 .room .chatArea .chatInput {
   display: flex;
-  border: 1px solid black;
+  width: 760px;
+  margin-top: 3px;
 }
 .room .chatArea .chatInput .inputArea {
-  border: 1px solid crimson;
+  flex: 9;
+  background-color: white;
+}
+.room .chatArea .chatInput .inputArea input {
+  border: 0px;
+  padding-left: 5px;
+  width: 100%;
+  height: 100%;
+}
+.room .chatArea .chatInput .inputArea input:focus {
+  outline: none;
+  border-color: blueviolet;
+  box-shadow: 0 0 5px blueviolet;
 }
 .room .chatArea .chatInput .buttonArea {
-  border: 1px solid crimson;
+  flex: 1;
+  padding: 3px;
+  text-align: end;
+  vertical-align: middle;
+  margin-left: 5px;
+  background-color: darkslateblue;
+}
+.room .chatArea .chatInput .buttonArea:hover {
+  background-color: darkorchid;
+  border-color: #d6a8e9;
+  box-shadow: 0 0 3px #d6a8e9;
+}
+.room .chatArea .chatInput .buttonArea button {
+  border: 0px;
+  background-color: transparent;
+  color: white;
+  width: 100%;
+  height: 100%;
 }
 
 /*# sourceMappingURL=app.css.map */

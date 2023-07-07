@@ -93,12 +93,8 @@ function App() {
 
   if (!ws) return <></>
   if (page === 'room') return <Room appStateSet={appStateSet} userName={userName} ws={ws} roomInfo={roomInfo} />
+  return <Lobby appStateSet={appStateSet} userName={userName} ws={ws} roomList={roomList} />
 
-  return (
-    <div>
-      <Lobby appStateSet={appStateSet} userName={userName} ws={ws} roomList={roomList} />
-    </div>
-  )
 }
 
 export default App;
