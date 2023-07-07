@@ -21,13 +21,15 @@ const Lobby = (props) => {
       console.log(roomList)
       const arr = []
       roomList.forEach((e, i) => {
-        const { roomId, roomMember, roomMaster } = e
+        const { roomId, title, roomMember, roomMaster, game } = e
 
         arr.push(
           <tr key={i} onClick={() => enterRoom(roomId)}>
-            <td>{roomId}</td>
-            <td>방</td>
-            <td>{roomMaster.name}</td>
+            <td className='number'>{roomId}</td>
+            <td className='title'>{title}</td>
+            <td className='master'>{roomMaster}</td>
+            <td className='member'>{roomMember} / 6</td>
+            <td className='status'>{game ? '게임중' : '대기중'}</td>
           </tr>
         )
       })
@@ -99,23 +101,28 @@ const Lobby = (props) => {
 
 
   return (
-    <div className="Lobby">
-      <div className="title">
-        <h1>캐치마인드</h1>
-        <h4>{userName}</h4>
+    <div className='lobby'>
+      <div className='headArea'>
+        <div className='logo'>
+
+        </div>
+
+        <div className="buttonArea">
+          {/* <button onClick="{changeName}">닉네임 변경하기</button> */}
+          <button onClick={createRoom}>방 만들기</button>
+        </div>
       </div>
-      <div className="buttonArea">
-        {/* <button onClick="{changeName}">닉네임 변경하기</button> */}
-        <button onClick={createRoom}>방 만들기</button>
-      </div>
+
 
       <div className="roomList">
         <table>
           <thead>
             <tr>
-              <th>번호</th>
-              <th>방제목</th>
-              <th>방장</th>
+              <th className='number'>번호</th>
+              <th className='title'>방제목</th>
+              <th className='master'>방장</th>
+              <th className='member'>인원</th>
+              <th className='status'>상태</th>
             </tr>
           </thead>
           <tbody>

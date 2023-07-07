@@ -1,11 +1,6 @@
+@charset "UTF-8";
 * {
   box-sizing: border-box;
-}
-
-.app {
-  text-align: center;
-  background-image: url("../img/bg_control.jpg");
-  background-size: auto;
 }
 
 html,
@@ -62,6 +57,9 @@ body {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
+.room .controlArea .buttonArea button:hover {
+  cursor: pointer;
+}
 .room .controlArea .timeArea {
   background-color: aliceblue;
   width: 170px;
@@ -113,14 +111,22 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 5px;
-  background-color: azure;
+  background-color: rgb(201, 230, 255);
 }
 .room .chatArea .chatView {
-  width: 760px;
+  width: 750px;
   height: 100px;
   padding: 3px;
   font-size: 14px;
-  overflow: scroll;
+  overflow-y: scroll;
+  /* 인터넷 익스플로러 */
+  -ms-overflow-style: none;
+  /* 파이어폭스 */
+  scrollbar-width: none;
+}
+.room .chatArea .chatView::-webkit-scrollbar {
+  display: none;
+  /* 크롬, 사파리, 오페라, 엣지 */
 }
 .room .chatArea .chatInput {
   display: flex;
@@ -132,6 +138,7 @@ body {
   background-color: white;
 }
 .room .chatArea .chatInput .inputArea input {
+  background-color: transparent;
   border: 0px;
   padding-left: 5px;
   width: 100%;
@@ -151,9 +158,9 @@ body {
   background-color: darkslateblue;
 }
 .room .chatArea .chatInput .buttonArea:hover {
-  background-color: darkorchid;
-  border-color: #d6a8e9;
-  box-shadow: 0 0 3px #d6a8e9;
+  background-color: cornflowerblue;
+  border-color: blueviolet;
+  box-shadow: 0 0 5px blueviolet;
 }
 .room .chatArea .chatInput .buttonArea button {
   border: 0px;
@@ -161,6 +168,83 @@ body {
   color: white;
   width: 100%;
   height: 100%;
+}
+
+.lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: blueviolet;
+}
+.lobby .headArea {
+  display: flex;
+  justify-content: space-between;
+  width: 800px;
+}
+.lobby .headArea .logo {
+  background-image: url("../img/lobby_logo.png");
+  background-size: auto;
+  background-position: -129px 0px;
+  width: 500px;
+  height: 290px;
+}
+.lobby .headArea .buttonArea {
+  display: flex;
+  align-items: end;
+  justify-content: end;
+}
+.lobby .headArea .buttonArea button {
+  width: 80px;
+  height: 30px;
+  font-weight: 900;
+  margin: 1px;
+  border: 0px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.lobby .roomList {
+  width: 800px;
+  height: 400px;
+  overflow-y: scroll;
+  /* 인터넷 익스플로러 */
+  -ms-overflow-style: none;
+  /* 파이어폭스 */
+  scrollbar-width: none;
+}
+.lobby .roomList::-webkit-scrollbar {
+  display: none;
+  /* 크롬, 사파리, 오페라, 엣지 */
+}
+.lobby .roomList table {
+  border-collapse: collapse;
+  border-top: 1px solid white;
+}
+.lobby .roomList table thead th {
+  color: white;
+}
+.lobby .roomList table thead th.number {
+  width: 50px;
+}
+.lobby .roomList table thead th.title {
+  width: 350px;
+}
+.lobby .roomList table thead th.master {
+  width: 200px;
+}
+.lobby .roomList table thead th.member {
+  width: 100px;
+}
+.lobby .roomList table thead th.status {
+  width: 100px;
+}
+.lobby .roomList table tbody tr {
+  border-top: 1px solid white;
+}
+.lobby .roomList table tbody tr td {
+  text-align: center;
+}
+.lobby .roomList table tbody tr td.title {
+  text-align: start;
 }
 
 /*# sourceMappingURL=app.css.map */

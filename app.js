@@ -5,10 +5,9 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
+const fs = require('fs');
 // dotenv
 dotenv.config();
-
-
 
 
 
@@ -22,6 +21,7 @@ app.set('httpPort', process.env.HTTP_PORT || 80);
 const gUsers = {};
 const gRooms = {};
 let roomNumber = 0;
+const words = fs.readFileSync('./modules/words.txt').toString('utf-8').split('\r\n');
 
 
 // Middlewares ---------------------
@@ -109,14 +109,19 @@ const HTTPServer = app.listen(app.get('httpPort'), () => {
 // Websocket ---------------------
 
 let count = 0;
-const gwords = ['자동차', '카페']
 
 const game = (roomId) => {
   // 해당 room id를 가진 룸 객체
   const room = gRooms[roomId];
 
-  // 게임 중임을 표기
+  // 게임 중 상태 설정
   room.game = true;
+
+
+
+  // 라운드 설정
+  // 이전 게임의 라운드를 불러오고 없으면 0라운드로 설정
+  room.round = room.round + 1 || 0;
 
   room.roomMember.forEach(e => {
     gUsers[e].send(JSON.stringify({
@@ -127,9 +132,7 @@ const game = (roomId) => {
     }));
   })
 
-  // 라운드 설정
-  // 이전 게임의 라운드를 불러오고 없으면 0라운드로 설정
-  room.round = room.round + 1 || 0;
+
   console.log(room.round)
   // 라운드가 끝났는지 판별
   if (room.round > 4) {
@@ -140,7 +143,8 @@ const game = (roomId) => {
       gUsers[e].send(JSON.stringify({
         response: 'roomInfo',
         message: {
-          game: false
+          game: false,
+          answer: ''
         }
       }));
     })
@@ -152,7 +156,7 @@ const game = (roomId) => {
   const presenter = room.roomMember[room.round % room.roomMember.length]
 
   // 정답 설정
-  room.answer = '자동차'
+  room.answer = words[Math.floor(Math.random() * words.length)]
 
   // 출제자와 도전자에게 게임정보 보냄
   room.roomMember.forEach(e => {
@@ -162,7 +166,7 @@ const game = (roomId) => {
       gUsers[e].send(JSON.stringify({
         response: 'present',
         message: {
-          round: room.round,
+          round: room.round + 1,
           presenter,
           answer: room.answer
         },
@@ -173,8 +177,8 @@ const game = (roomId) => {
       gUsers[e].send(JSON.stringify({
         response: 'solver',
         message: {
+          round: room.round + 1,
           presenter,
-          correct: gUsers[e].correct
         }
       }));
     }
@@ -237,15 +241,15 @@ webSocketServer.on('connection', (ws, req) => {
 
     // 방 리스트 요청
     if (request === 'roomList') {
+      // 모든 방의 방정보를 담은 배열
       const roomList = Object.values(gRooms)
-      const message = roomList.map(e => {
-        const { roomId, roomMaster } = e;
-        return { roomId, roomMaster }
-      })
 
       ws.send(JSON.stringify({
         response: 'roomList',
-        message
+        message: roomList.map(e => {
+          const { roomId, title, roomMember, roomMaster, game } = e;
+          return { roomId, title, roomMember: roomMember.length, roomMaster, game }
+        })
       }));
     }
 
@@ -390,7 +394,7 @@ webSocketServer.on('connection', (ws, req) => {
     // 게임 시작
     if (request === 'startGame') {
       const room = gRooms[location];
-      if (room.game) return
+      if (room?.game) return
 
       delete room.correct;
 
@@ -463,13 +467,27 @@ webSocketServer.on('connection', (ws, req) => {
 
     if (ws.location !== 'lobby') {
       const room = gRooms[ws.location];
-      if (room.roomMember.length === 1) delete gRooms[ws.location]
+      if (room.roomMember.length === 1) {
+        delete gRooms[ws.location]
+        if (room.game) clearInterval(room.timer)
+      }
       else {
         const roomMemberIdx = room.roomMember.findIndex(e => e === ws.name);
         room.roomMember.splice(roomMemberIdx, 1);
-      }
-      console.log(room)
+        if (room.roomMaster === ws.name) room.roomMaster = room.roomMember[0];
 
+      }
+
+      // 
+      room.roomMember.forEach(e => {
+        gUsers[e].send(JSON.stringify({
+          response: 'roomInfo',
+          message: {
+            roomMember: room.roomMember,
+            roomMaster: room.roomMaster
+          }
+        }));
+      })
     }
   })
 });

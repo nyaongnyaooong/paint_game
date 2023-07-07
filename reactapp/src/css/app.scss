@@ -2,11 +2,11 @@
   box-sizing: border-box;
 }
 
-.app {
-  text-align: center;
-  background-image: url('../img/bg_control.jpg');
-  background-size: auto;
-}
+// .app {
+//   text-align: center;
+//   background-image: url('../img/bg_control.jpg');
+//   background-size: auto;
+// }
 
 // .canvas_wrap {
 //   background-color: black;
@@ -33,7 +33,7 @@ body {
   align-items: center;
   // background-color: ;
 
-  .controlArea {  
+  .controlArea {
     display: flex;
     justify-content: center;
     height: 70px;
@@ -68,13 +68,16 @@ body {
         border: 0px;
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
+
+        &:hover {
+          cursor: pointer;
+        }
       }
     }
 
     .timeArea {
       background-color: aliceblue;
       width: 170px;
-
     }
 
   }
@@ -137,16 +140,25 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 5px;
-    background-color: azure;
+    background-color: rgb(201, 230, 255);
 
     .chatView {
-      width: 760px;
+      width: 750px;
       height: 100px;
       // background-color: transparent;
       padding: 3px;
       font-size: 14px;
       // border: 1px solid black;
-      overflow: scroll;
+      overflow-y: scroll;
+      /* 인터넷 익스플로러 */
+      -ms-overflow-style: none;
+      /* 파이어폭스 */
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+        /* 크롬, 사파리, 오페라, 엣지 */
+      }
     }
 
     .chatInput {
@@ -160,6 +172,7 @@ body {
         background-color: white;
 
         input {
+          background-color: transparent;
           border: 0px;
           padding-left: 5px;
           width: 100%;
@@ -185,9 +198,9 @@ body {
         background-color: darkslateblue;
 
         &:hover {
-          background-color: darkorchid;
-          border-color: #d6a8e9;
-          box-shadow: 0 0 3px #d6a8e9;
+          background-color: cornflowerblue;
+          border-color: blueviolet;
+          box-shadow: 0 0 5px blueviolet;
         }
 
         button {
@@ -201,5 +214,109 @@ body {
         // border: 1px solid crimson;
       }
     }
+  }
+}
+
+
+.lobby {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: blueviolet;
+
+  .headArea {
+    display: flex;
+    justify-content: space-between;
+    width: 800px;
+
+    .logo {
+      background-image: url('../img/lobby_logo.png');
+      background-size: auto;
+      background-position: -129px 0px;
+      width: 500px;
+      height: 290px;
+    }
+
+    .buttonArea {
+      display: flex;
+      align-items: end;
+      justify-content: end;
+
+      button {
+        width: 80px;
+        height: 30px;
+        font-weight: 900;
+        margin: 1px;
+        border: 0px;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+      }
+    }
+  }
+
+  .roomList {
+    width: 800px;
+    height: 400px;
+    overflow-y: scroll;
+    /* 인터넷 익스플로러 */
+    -ms-overflow-style: none;
+    /* 파이어폭스 */
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+      /* 크롬, 사파리, 오페라, 엣지 */
+    }
+
+    table {
+      border-collapse: collapse;
+      border-top: 1px solid white;
+
+      thead {
+        th {
+          color: white;
+
+          &.number {
+            width: 50px;
+          }
+
+          &.title {
+            width: 350px;
+
+          }
+
+          &.master {
+            width: 200px;
+
+          }
+
+          &.member {
+            width: 100px;
+
+          }
+
+          &.status {
+            width: 100px;
+
+          }
+        }
+      }
+
+      tbody {
+        tr {
+          border-top: 1px solid white;
+
+          td {
+            text-align: center;
+
+            &.title {
+              text-align: start;
+            }
+
+          }
+        }
+      }
+    }
+
   }
 }

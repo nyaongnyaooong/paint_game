@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 const Room = (props) => {
   const { appStateSet, userName, ws, roomInfo } = props;
   const { setPage } = appStateSet;
-  const { roomId: location, roomMember, roomMaster, history } = roomInfo
+  const { roomId: location, history } = roomInfo
 
   // roomInfo.correct = {};
   // roomMember.forEach(e => {
@@ -10,7 +10,7 @@ const Room = (props) => {
   // })
 
   const [drawAuth, setDrawAuth] = useState(true)
-  const [chatHistory, setChatHistory] = useState([]);
+  const [chatLog, setChatLog] = useState([]);
   const [nowTime, setNowTime] = useState(new Date());
   const [timerTime, setTimerTime] = useState(new Date());
 
@@ -18,13 +18,12 @@ const Room = (props) => {
   const [preCoord, setPreCoord] = useState({ x: 0, y: 0 })
 
   const [information, setInformation] = useState({ ...roomInfo, correct: {} });
-  // console.log(information.roomMember[0])
+
   // Canvas 요소에 접근하기 위한 Ref 생성
   const refCanvas = useRef(null);
   const refAudio = useRef(null);
-
-  // 그림 그리기에 필요한 변수들
-  // let isDrawing = false;
+  const refChat = useRef(null);
+  const refInput = useRef(null);
 
 
   useEffect(() => {
@@ -74,7 +73,7 @@ const Room = (props) => {
 
       // 채팅 정보 수신
       if (response === 'chat') {
-        setChatHistory((preState) => [...preState, message]);
+        setChatLog((preState) => [...preState, message]);
       }
 
       // 방 정보 업데이트
@@ -85,6 +84,10 @@ const Room = (props) => {
           Object.keys(message).forEach(key => {
             newState[key] = message[key];
           })
+          if (preState.game && !newState.game) {
+            context.clearRect(0, 0, $canvas.width, $canvas.height);
+            setDrawAuth(true)
+          }
           return newState;
         })
       }
@@ -94,6 +97,26 @@ const Room = (props) => {
 
       // 게임 시작
       if (response === 'present' || response === 'solver') {
+
+        const { round, presenter, answer } = message;
+
+        setInformation((preState) => {
+          const newState = { ...preState };
+          newState.presenter = presenter;
+          newState.round = round;
+
+          if (response === 'present') {
+            newState.answer = answer;
+          }
+
+          if (response === 'solver') {
+            newState.answer = '';
+          }
+          return newState;
+        })
+
+
+        // 캔버스 초기화
         context.clearRect(0, 0, $canvas.width, $canvas.height);
 
         setTimerTime(() => {
@@ -103,6 +126,7 @@ const Room = (props) => {
 
       }
 
+      // 누군가 정답을 맞춤
       if (response === 'correct') {
 
         setTimerTime(() => new Date())
@@ -131,6 +155,14 @@ const Room = (props) => {
       clearInterval(timerView)
     };
   }, []);
+
+  useEffect(() => {
+    const $chat = refChat.current
+    if ($chat.scrollHeight - $chat.scrollTop === 118)
+      $chat.scrollTop = $chat.scrollHeight;
+    if ($chat.scrollHeight === 114)
+      $chat.scrollTop = $chat.scrollHeight;
+  }, [chatLog])
 
   // 마우스를 이동할 때 호출되는 이벤트 핸들러
   const handleMouseMove = (e) => {
@@ -205,6 +237,7 @@ const Room = (props) => {
   }
 
   const startGame = () => {
+    if (information.roomMember.length < 2) return
     ws.send(JSON.stringify({
       name: userName,
       location,
@@ -216,14 +249,13 @@ const Room = (props) => {
   // 채팅 보내기
   const sendChat = (event) => {
     event.preventDefault();
+    if (information.presenter === userName) return;
 
     const $input = event.target.chatContent;
     const content = $input.value;
     event.target.chatContent.value = '';
 
-    if (content === '') {
-      return;
-    }
+    if (!content) return;
     $input.focus();
 
     // 채팅 내용 전송
@@ -235,7 +267,8 @@ const Room = (props) => {
     }))
 
     // state
-    setChatHistory((preState) => [...preState, { chatter: userName, content }]);
+    setChatLog((preState) => [...preState, { chatter: userName, content }]);
+
   }
 
   const UserView = (props) => {
@@ -277,6 +310,11 @@ const Room = (props) => {
             ? timerTime - nowTime
             : 0
           }
+          {
+            information.round
+              ? information.round
+              : <></>
+          }
         </div>
 
 
@@ -297,7 +335,9 @@ const Room = (props) => {
         </div>
         <div className='canvasArea'>
           <div className='answerArea'>
-
+            {
+              information.answer ? information.answer : <></>
+            }
           </div>
           <div className='canvasWrap'>
             <canvas
@@ -319,10 +359,10 @@ const Room = (props) => {
         </div>
 
       </div>
-      <div className='chatArea'>
-        <div className='chatView'>
+      <div className='chatArea' onClick={() => { refInput.current.focus(); }}>
+        <div ref={refChat} className='chatView'>
           {
-            chatHistory.map((chat, index) => (
+            chatLog.map((chat, index) => (
               <div key={index}>
                 {chat.chatter + ': ' + chat.content}
               </div>
@@ -331,7 +371,7 @@ const Room = (props) => {
         </div>
         <form className='chatInput' onSubmit={sendChat}>
           <div className='inputArea'>
-            <input name='chatContent'></input>
+            <input ref={refInput} name='chatContent'></input>
           </div>
           <div className='buttonArea'>
             <button>전송</button>
