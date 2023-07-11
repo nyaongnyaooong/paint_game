@@ -44,20 +44,10 @@ app.use(morgan('dev'));
 
 // Routers ---------------------
 
-// Main
-app.get("/", (req, res) => {
-  const userInfo = req.cookies?.userInfo;
-  if (!userInfo || !!userInfo?.nickName) return res.redirect('/setname')
-  // if (!userInfo) return res.redirect('/setname')
-
-  res.sendFile(path.join(__dirname, 'public/html/index.html'));
-});
-
-// 닉네임 설정 페이지
-app.get("/setname", (req, res) => {
-  res.sendFile(path.join(__dirname, '/public/html/setName.html'));
-});
-
+// // Main
+// app.get("/", (req, res) => {
+//   res.sendFile(path.join(__dirname, 'public/html/index.html'));
+// });
 
 // 닉네임 설정 요청 처리
 app.post("/setname", (req, res) => {
@@ -73,21 +63,9 @@ app.post("/setname", (req, res) => {
     path: '/',
   });
 
-  res.cookie('userInfo2', nickName, {
-    path: '/',
-  });
-
-  res.cookie('userInfo3', nickName, {
-    path: '/',
-  });
-  res.redirect('/');
+  res.send(true)
 });
 
-app.get('test', (req, res) => {
-  res.send('123')
-})
-
-app.set('trust proxy', true);
 
 // 404
 app.use((req, res, next) => {
@@ -108,16 +86,17 @@ const HTTPServer = app.listen(app.get('httpPort'), () => {
 
 // Websocket ---------------------
 
-let count = 0;
 
+// 게임 라운드 실행 함수
 const game = (roomId) => {
-  // 해당 room id를 가진 룸 객체
+
+  // 1라운드 진행 시간 설정(ms)
+  const roundTime = 120000;
+
   const room = gRooms[roomId];
 
   // 게임 중 상태 설정
   room.game = true;
-
-
 
   // 라운드 설정
   // 이전 게임의 라운드를 불러오고 없으면 0라운드로 설정
@@ -132,9 +111,7 @@ const game = (roomId) => {
     }));
   })
 
-
-  console.log(room.round)
-  // 라운드가 끝났는지 판별
+  // 라운드가 끝났는지 확인
   if (room.round > 4) {
     room.game = false;
     room.round = -1;
@@ -144,7 +121,8 @@ const game = (roomId) => {
         response: 'roomInfo',
         message: {
           game: false,
-          answer: ''
+          answer: '',
+          presenter: ''
         }
       }));
     })
@@ -168,7 +146,8 @@ const game = (roomId) => {
         message: {
           round: room.round + 1,
           presenter,
-          answer: room.answer
+          answer: room.answer,
+          roundTime
         },
       }));
     } else {
@@ -179,6 +158,7 @@ const game = (roomId) => {
         message: {
           round: room.round + 1,
           presenter,
+          roundTime
         }
       }));
     }
@@ -186,8 +166,13 @@ const game = (roomId) => {
 
   room.timer = setTimeout(() => {
     game(roomId);
-  }, 10000)
+  }, roundTime)
   return
+}
+
+// 게임 중간 딜레이 함수
+const gameDelay = (roomId) => {
+
 }
 
 // WebSocket 서버
@@ -201,13 +186,10 @@ const webSocketServer = new wsModule.Server(
 // connection(클라이언트 연결) 이벤트 처리
 webSocketServer.on('connection', (ws, req) => {
 
-  const ip = ++count;
-
   // 첫 연결시 1회 실행
   if (ws.readyState === ws.OPEN) { // 연결 여부 체크
-    console.log('클라이언트[' + ip + '] 접속')
+    console.log('클라이언트 접속')
     ws.correct = 0;
-    // ws.send(`클라이언트[${ip}] 접속을 환영합니다 from 서버`); // 데이터 전송
     // ws.send(id); // 데이터 전송
   }
 
@@ -222,21 +204,32 @@ webSocketServer.on('connection', (ws, req) => {
 
     // 클라이언트가 닉네임 변경을 요청
     if (request === 'setName') {
-      console.log('닉네임 변경 요청' + name)
-      // 기존 클라이언트 중에 동일한 닉네임이 있는지 검사
-      webSocketServer.clients.forEach(client => {
-        // 있으면 연결을 끊음
-        if (client.name === name) {
-          ws.send(JSON.stringify({
-            response: 'error',
-            message: 'duplicated name'
-          }));
-          ws.close();
-        }
-      });
 
-      gUsers[name] = ws;
-      ws.name = name;
+      if (gUsers[data] && name !== data) {
+        ws.send(JSON.stringify({
+          response: 'error',
+          message: 'duplicated name'
+        }));
+      } else {
+        gUsers[data] = ws;
+        ws.name = data;
+
+        ws.send(JSON.stringify({
+          response: 'setNameSuccess',
+          message: data
+        }));
+      }
+      // // 기존 클라이언트 중에 동일한 닉네임이 있는지 검사
+      // webSocketServer.clients.forEach(client => {
+      //   // 있으면 연결을 끊음
+      //   if (client.name === name) {
+      //     ws.send(JSON.stringify({
+      //       response: 'error',
+      //       message: 'duplicated name'
+      //     }));
+      //     ws.close();
+      //   }
+      // });
     }
 
     // 방 리스트 요청
@@ -277,7 +270,8 @@ webSocketServer.on('connection', (ws, req) => {
     }
 
     // 방 입장/퇴장 요청
-    if (request === 'locate') {   //퇴장
+    // 이하 퇴장 요청 부분
+    if (request === 'locate') {
       if (data === 'lobby') {
         // 퇴실하기 전 방의 index
         const clientRoom = gRooms[location]
@@ -304,10 +298,6 @@ webSocketServer.on('connection', (ws, req) => {
           })
         } else delete gRooms[location]
 
-
-
-
-
         // 방 퇴실
         ws.send(JSON.stringify({
           response: 'enter',
@@ -318,7 +308,9 @@ webSocketServer.on('connection', (ws, req) => {
 
         // location 저장
         ws.location = 'lobby';
-      } else {    //입장
+
+        //이하 입장 요청 부분
+      } else {
         // 입장 요청한 방의 index값을 배열에서 찾음
         const clientRoom = gRooms[data]
 
@@ -329,6 +321,16 @@ webSocketServer.on('connection', (ws, req) => {
             response: 'error',
             message: 'room does not exist',
           }));
+
+          // 이하 풀 방일 경우
+        } else if (clientRoom.roomMember.length > 5) {
+          // 방 입장 불허
+          ws.send(JSON.stringify({
+            response: 'error',
+            message: 'member is full',
+          }));
+
+          // 이하 입장 허가
         } else {
           const { roomId, roomMember, roomMaster, history } = clientRoom
 
@@ -373,7 +375,7 @@ webSocketServer.on('connection', (ws, req) => {
     if (request === 'draw') {
       // 입장 중인 방의 index
       const clientRoom = gRooms[location]
-      // const idx = gRooms.findIndex(e => e.roomId === clientMsg.location)
+
 
       // 자신을 제외한 모든 멤버에서 그리기 데이터 전송
       clientRoom.roomMember.forEach(e => {
@@ -389,6 +391,43 @@ webSocketServer.on('connection', (ws, req) => {
 
       // 방 히스토리 추가
       clientRoom.history.push({ ...data });
+    }
+
+    // 페인트 색상 변경
+    if (request === 'changePaint') {
+      // 입장 중인 방의 index
+      const clientRoom = gRooms[location]
+
+
+      clientRoom.roomMember.forEach(e => {
+        if (e !== ws.name) {
+          gUsers[e].send(JSON.stringify({
+            response: 'changePaint',
+            message: data
+          }));
+        }
+      })
+
+      clientRoom.history.push({ color: data });
+    }
+
+    // 모든 그림 삭제
+    if (request === 'clear') {
+      // 입장 중인 방의 index
+      const clientRoom = gRooms[location]
+
+      // 자신을 제외한 모든 멤버에게 클리어 명령
+      clientRoom.roomMember.forEach(e => {
+        if (e !== ws.name) {
+          gUsers[e].send(JSON.stringify({
+            response: 'clear',
+          }));
+        }
+      })
+
+      // 방 히스토리 초기화
+      console.log(11)
+      clientRoom.history = [];
     }
 
     // 게임 시작
@@ -459,13 +498,13 @@ webSocketServer.on('connection', (ws, req) => {
   })
 
   ws.on('error', (error) => {
-    console.log(`클라이언트[${ip}] 연결 에러발생 : ${error}`);
+    console.log(`클라이언트 연결 에러발생 : ${error}`);
   })
 
   ws.on('close', () => {
     delete gUsers[ws.name];
 
-    if (ws.location !== 'lobby') {
+    if (ws.location !== 'lobby' && gRooms[ws.location]) {
       const room = gRooms[ws.location];
       if (room.roomMember.length === 1) {
         delete gRooms[ws.location]
@@ -478,15 +517,17 @@ webSocketServer.on('connection', (ws, req) => {
 
       }
 
-      // 
+      // 마스터 변경
       room.roomMember.forEach(e => {
-        gUsers[e].send(JSON.stringify({
-          response: 'roomInfo',
-          message: {
-            roomMember: room.roomMember,
-            roomMaster: room.roomMaster
-          }
-        }));
+        if (gUsers[e]) {
+          gUsers[e].send(JSON.stringify({
+            response: 'roomInfo',
+            message: {
+              roomMember: room.roomMember,
+              roomMaster: room.roomMaster
+            }
+          }));
+        }
       })
     }
   })

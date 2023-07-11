@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Lobby } from './component/Lobby';
 import { Room } from './component/Room';
+import { SetName } from './component/SetName';
 
 import './css/app.css';
 
@@ -41,25 +42,28 @@ function App() {
     })
 
     // 닉네임
-    const userName = cookieParse?.userInfo.name;
-    setUserName(cookieParse?.userInfo.name)
-
-
-
-    // websocket
-    // const host = window.location.host;
-
+    const userName = cookieParse?.userInfo?.name;
+    setUserName(cookieParse?.userInfo?.name)
+    console.log(window.location.href)
     const webSocket = new WebSocket('ws://' + window.location.hostname + ':8080');
+
+
 
     // 2. 웹소켓 이벤트 처리
     // 2-1) 연결 이벤트 처리
     webSocket.onopen = () => {
       setWs(webSocket)
-      webSocket.send(JSON.stringify({
-        name: userName,
-        location: 'lobby',
-        request: 'setName'
-      }))
+
+      if (!userName) {
+        setPage('setName')
+      } else {
+        webSocket.send(JSON.stringify({
+          name: undefined,
+          location: 'lobby',
+          request: 'setName',
+          data: userName
+        }))
+      }
     };
 
     // 2-3) 연결 종료 이벤트 처리
@@ -80,16 +84,19 @@ function App() {
       if (response === 'error') {
         if (serverMsg.message === 'duplicated name') {
           alert('중복된 닉네임입니다!\n다른 닉네임을 입력해주세요')
-          window.location.href = '/setname';
+          setPage('setName')
         } else if (message === 'room does not exist') {
           alert('존재하지 않는 방입니다')
         }
       }
     }
 
+
+
   }, []);
 
   if (!ws) return <></>
+  if (page === 'setName') return <SetName appStateSet={appStateSet} userName={userName} ws={ws} />
   if (page === 'room') return <Room appStateSet={appStateSet} userName={userName} ws={ws} roomInfo={roomInfo} />
   return <Lobby appStateSet={appStateSet} userName={userName} ws={ws} roomList={roomList} />
 

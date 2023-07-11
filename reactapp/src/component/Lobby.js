@@ -3,18 +3,9 @@ import { useState, useRef, useEffect } from 'react';
 
 const Lobby = (props) => {
   const { appStateSet, userName, ws, roomList } = props;
-  const { setPage, setHistory, setLocation, setRoomList, setMaster, setRoomInfo } = appStateSet;
+  const { setPage, setLocation, setRoomList, setRoomInfo } = appStateSet;
 
   const [html, setHtml] = useState([])
-
-  const enterRoom = (id) => {
-    ws.send(JSON.stringify({
-      name: userName,
-      location: 'lobby',
-      request: 'locate',
-      data: id
-    }))
-  }
 
   useEffect(() => {
     if (roomList.length > 0) {
@@ -39,7 +30,6 @@ const Lobby = (props) => {
     }
   }, [roomList])
 
-
   // 쿠키에서 닉네임을 읽어서 표기
   useEffect(() => {
 
@@ -60,11 +50,13 @@ const Lobby = (props) => {
       console.log(serverMsg)
 
       if (response === 'error') {
-        if (serverMsg.message === 'duplicated name') {
+        if (message === 'duplicated name') {
           alert('중복된 닉네임입니다!\n다른 닉네임을 입력해주세요')
-          window.location.href = '/setname';
+          setPage('setName');
         } else if (message === 'room does not exist') {
           alert('존재하지 않는 방입니다')
+        } else if (message === 'member is full') {
+          alert('정원이 꽉 찼습니다')
         }
       }
 
@@ -90,7 +82,7 @@ const Lobby = (props) => {
     };
   }, [])
 
-
+  // 방 만들기
   const createRoom = () => {
     ws.send(JSON.stringify({
       name: userName,
@@ -99,6 +91,15 @@ const Lobby = (props) => {
     }))
   }
 
+  // 방 입장
+  const enterRoom = (id) => {
+    ws.send(JSON.stringify({
+      name: userName,
+      location: 'lobby',
+      request: 'locate',
+      data: id
+    }))
+  }
 
   return (
     <div className='lobby'>
@@ -107,10 +108,18 @@ const Lobby = (props) => {
 
         </div>
 
-        <div className="buttonArea">
-          {/* <button onClick="{changeName}">닉네임 변경하기</button> */}
-          <button onClick={createRoom}>방 만들기</button>
+        <div className='rightArea'>
+          <div className='nameArea'>
+            <div className='nameTitle'>닉네임</div>
+            <div className='nameWrap'>{userName}</div>
+          
+          </div>
+          <div className="buttonArea">
+            <button className='bgYellow' onClick={() => {setPage('setName')}}>닉네임 <br />변경하기</button>
+            <button className='bgBlue' onClick={createRoom}>방 만들기</button>
+          </div>
         </div>
+
       </div>
 
 

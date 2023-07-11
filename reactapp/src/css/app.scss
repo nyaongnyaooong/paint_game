@@ -18,6 +18,10 @@ body {
   margin: 0;
 }
 
+button:hover {
+  cursor: pointer;
+}
+
 #root {
   width: 100%;
   height: 100%;
@@ -36,7 +40,7 @@ body {
   .controlArea {
     display: flex;
     justify-content: center;
-    height: 70px;
+    height: 80px;
 
     .logoArea {
       display: flex;
@@ -44,9 +48,8 @@ body {
       width: 170px;
       padding: 5px;
 
-
       .logo {
-        width: 90px;
+        width: 110px;
         height: 100%;
         background-image: url('../img/logo.png');
         background-size: cover;
@@ -58,7 +61,7 @@ body {
       width: 450px;
       align-items: end;
       justify-content: end;
-      background-color: #d6a8e9;
+      // background-color: #d6a8e9;
 
       button {
         width: 80px;
@@ -66,6 +69,7 @@ body {
         font-weight: 900;
         margin: 1px;
         border: 0px;
+        color: white;
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
 
@@ -75,9 +79,63 @@ body {
       }
     }
 
-    .timeArea {
-      background-color: aliceblue;
-      width: 170px;
+    .gameInfoArea {
+      display: flex;
+      // background-color: aliceblue;
+      // border-radius: 5px;
+      margin: 10px;
+      width: 150px;
+      text-align: center;
+      vertical-align: middle;
+
+      .roundArea {
+        background-color: azure;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-radius: 5px;
+        margin-right: 3px;
+
+        .roundTitle {
+          background-color: cornflowerblue;
+          color: azure;
+
+        }
+
+        .round {
+          // background-color: aqua;
+          font-size: 25px;
+
+        }
+      }
+
+      .timeArea {
+        background-color: azure;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-radius: 5px;
+        margin-left: 3px;
+
+        .timeTitle {
+          background-color: darkcyan;
+          color: azure;
+
+        }
+
+        .time {
+          background-color: azure;
+          border-radius: 5px;
+          // background-color: aqua;
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 25px;
+        }
+
+
+      }
     }
 
   }
@@ -98,9 +156,30 @@ body {
       align-items: center;
 
       .user {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         width: 120px;
         height: 80px;
-        background-color: white;
+        padding: 3px;
+        // background-color: rgb(153, 0, 255);
+        background-color: #b2afff;
+
+        .userNameArea {
+          background-color: cornflowerblue;
+
+          .userNameTitle {
+            font-size: 12px;
+          }
+        }
+
+        .correctArea {
+          color: white;
+        }
+
+        div {
+          text-align: center;
+        }
       }
     }
 
@@ -112,6 +191,9 @@ body {
       align-items: center;
 
       .answerArea {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 450px;
         height: 30px;
         background-color: white;
@@ -119,8 +201,7 @@ body {
         border-radius: 5px;
         margin-top: 3px;
         margin-bottom: 3px;
-        text-align: center;
-        vertical-align: middle;
+
       }
 
       .canvasWrap {
@@ -133,6 +214,81 @@ body {
     }
 
     .userArea2 {}
+  }
+
+  .canvasControlArea {
+    display: flex;
+    justify-content: center;
+    background-color: rgba(240, 248, 255, 0.529);
+    width: 770px;
+    // height: 80px;
+    padding: 10px;
+    margin-bottom: 10px;
+
+    img {
+      width: 35px;
+      margin: 10px;
+
+      &:hover {
+        filter: drop-shadow(0 0 10px white);
+      }
+    }
+
+    button {
+      width: 50px;
+      height: 50px;
+      margin: 10px;
+      border: 0px;
+      // border: 1px solid black;
+      border-radius: 50%;
+      background-color: transparent;
+
+      &:hover {
+        filter: drop-shadow(0 0 10px white);
+      }
+    }
+
+    .white {
+      font-size: 30px;
+      // background-color: red;
+      // width: 700px;
+
+    }
+
+    .clear {
+      font-size: 30px;
+      // background-color: #b2afff;
+
+    }
+
+    // .cRed {
+    //   background-color: red;
+
+    // }
+    // .cOrange {
+    //   background-color: Orange;
+
+    // }
+    // .cYellow {
+    //   background-color: yellow;
+
+    // }
+    // .cGreen {
+    //   background-color: green;
+
+    // }
+    // .cBlue {
+    //   background-color: blue;
+
+    // }
+    // .cPurple {
+    //   background-color: purple;
+
+    // }
+    // .cBlack {
+    //   background-color: black;
+
+    // }
   }
 
   .chatArea {
@@ -231,27 +387,75 @@ body {
 
     .logo {
       background-image: url('../img/lobby_logo.png');
-      background-size: auto;
-      background-position: -129px 0px;
-      width: 500px;
-      height: 290px;
+      background-size: cover;
+      background-position: -120px 0px;
+      width: 300px;
+      height: 180px;
     }
 
-    .buttonArea {
+    .rightArea {
       display: flex;
-      align-items: end;
-      justify-content: end;
+      justify-content: space-between;
+      flex-direction: column;
+      padding-top: 10px;
+      padding-right: 10px;
 
-      button {
-        width: 80px;
-        height: 30px;
-        font-weight: 900;
-        margin: 1px;
-        border: 0px;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
+      .nameArea {
+        display: flex;
+        flex-direction: column;
+        align-items: end;
+        // width: 100%;
+        // height: 50px;
+        margin-top: 15px;
+
+
+        .nameTitle {
+          width: 200px;
+          height: 30px;
+          background-color: mediumpurple;
+          border-top-left-radius: 5px;
+          border-top-right-radius: 5px;
+          padding: 5px;
+          font-weight: 900;
+          color: white;
+          text-align: center;
+          vertical-align: middle;
+
+        }
+
+        .nameWrap {
+          width: 200px;
+          height: 30px;
+          background-color: plum;
+          border-bottom-left-radius: 5px;
+          border-bottom-right-radius: 5px;
+          padding: 5px;
+          font-size: 14px;
+          color: white;
+          text-align: center;
+          vertical-align: middle;
+
+        }
+      }
+
+      .buttonArea {
+        display: flex;
+        align-items: end;
+        justify-content: end;
+
+        button {
+          width: 100px;
+          height: 40px;
+          color: white;
+          text-shadow: 0px 0px 3px black;
+          margin: 3px;
+          border: 0px;
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+        }
       }
     }
+
   }
 
   .roomList {
@@ -305,6 +509,9 @@ body {
       tbody {
         tr {
           border-top: 1px solid white;
+          &:hover {
+            cursor: pointer;
+          }
 
           td {
             text-align: center;
@@ -319,4 +526,108 @@ body {
     }
 
   }
+}
+
+
+.setName {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  // background-image: url('../img/palette.jpg');
+  // background-size: cover;
+
+  .titleArea {
+    // background-color: rgba(216, 254, 255, 0.377);
+    border-radius: 5px;
+    font-size: 25px;
+    width: 300px;
+    padding: 10px;
+    margin: 10px;
+    text-align: center;
+  }
+
+  .formArea {
+    display: flex;
+    flex-direction: column;
+
+    .inputArea {
+      text-align: center;
+
+      input {
+        border-radius: 15px;
+        border: 0;
+        background-color: aliceblue;
+        width: 200px;
+        height: 35px;
+        padding: 5px;
+        padding-left: 10px;
+
+        &:focus {
+          outline: none;
+          border-color: blueviolet;
+          box-shadow: 0 0 5px blueviolet;
+        }
+      }
+    }
+
+
+    .buttonArea {
+      display: flex;
+      justify-content: center;
+      width: 200px;
+      margin: 20px;
+      margin-bottom: 200px;
+
+      button {
+        border: 0;
+        margin: 5px;
+        border-radius: 3px;
+        width: 80px;
+        height: 30px;
+        font-weight: 800;
+
+        &:hover {
+          border-color: blueviolet;
+          box-shadow: 0 0 5px blueviolet;
+        }
+
+      }
+
+      .cancel {
+        background-color: aliceblue;
+        color: grey;
+      }
+
+      .confirm {
+        background-color: cornflowerblue;
+        color: white;
+      }
+    }
+
+
+  }
+}
+
+.bgRed {
+  background-color: crimson;
+}
+
+.bgYellow {
+  background-color: darkcyan;
+}
+
+.bgBlue {
+  background-color: deepskyblue;
+}
+
+.bgPink {
+  background-color: plum;
+}
+
+.bgGradBlue {
+  background: linear-gradient(rgb(95, 138, 255) 60%, #afbaff);
+  // background-color: ;
 }

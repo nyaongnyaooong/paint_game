@@ -31,15 +31,24 @@ const Room = (props) => {
     // 컴포넌트가 마운트될 때, Canvas 초기화
     const $canvas = refCanvas.current;
     const context = $canvas.getContext('2d');
+    context.lineCap = 'round'
     // context.strokeStyle = 'red';
     context.clearRect(0, 0, $canvas.width, $canvas.height);
 
+    console.log(history)
+    // 히스토리 정보에 따라 그림을 그림
     if (typeof history === 'object') {
       history.forEach(e => {
-        context.beginPath();
-        context.moveTo(e.prevX, e.prevY);
-        context.lineTo(e.x, e.y);
-        context.stroke();
+        if (e.prevX === undefined) {
+          context.strokeStyle = e.color;
+        }
+        else {
+          if (e.weight) context.lineWidth = e.weight;
+          context.beginPath();
+          context.moveTo(e.prevX, e.prevY);
+          context.lineTo(e.x, e.y);
+          context.stroke();
+        }
       })
     }
 
@@ -52,7 +61,7 @@ const Room = (props) => {
 
       const $canvas = refCanvas.current;
       const context = $canvas.getContext('2d');
-      // context.strokeStyle = 'red';
+
 
       console.log(serverMsg)
 
@@ -62,13 +71,29 @@ const Room = (props) => {
         }
       }
 
+      // 다른 사람의 그림 정보 받음
       if (response === 'draw') {
-        const { prevX, prevY, x, y } = message
+        const { weight, prevX, prevY, x, y } = message
 
+        context.lineWidth = weight ? weight : context.lineWidth;
         context.beginPath();
         context.moveTo(prevX, prevY);
         context.lineTo(x, y);
         context.stroke();
+      }
+
+      // 페인트 색상 변경 요청 받음
+      if (response === 'changePaint') {
+        if (message === 'erase') {
+          context.lineWidth = 20;
+        } else {
+          context.lineWidth = 1;
+        }
+        context.strokeStyle = message;
+      }
+
+      if (response === 'clear') {
+        context.clearRect(0, 0, $canvas.width, $canvas.height);
       }
 
       // 채팅 정보 수신
@@ -98,7 +123,7 @@ const Room = (props) => {
       // 게임 시작
       if (response === 'present' || response === 'solver') {
 
-        const { round, presenter, answer } = message;
+        const { round, presenter, answer, roundTime } = message;
 
         setInformation((preState) => {
           const newState = { ...preState };
@@ -121,7 +146,7 @@ const Room = (props) => {
 
         setTimerTime(() => {
           const nowTime = new Date();
-          return nowTime.setMilliseconds(nowTime.getMilliseconds() + 10000);
+          return nowTime.setMilliseconds(nowTime.getMilliseconds() + parseInt(roundTime));
         })
 
       }
@@ -156,12 +181,14 @@ const Room = (props) => {
     };
   }, []);
 
+  // 채팅 올라올 시 스크롤 맨 하단으로
   useEffect(() => {
     const $chat = refChat.current
-    if ($chat.scrollHeight - $chat.scrollTop === 118)
+    const substract = $chat.scrollHeight - $chat.scrollTop
+    if (substract > 115 && substract < 119)
       $chat.scrollTop = $chat.scrollHeight;
-    if ($chat.scrollHeight === 114)
-      $chat.scrollTop = $chat.scrollHeight;
+    // if ($chat.scrollHeight === 116)
+    //   $chat.scrollTop = $chat.scrollHeight;
   }, [chatLog])
 
   // 마우스를 이동할 때 호출되는 이벤트 핸들러
@@ -185,6 +212,7 @@ const Room = (props) => {
     context.lineTo(x, y);
     context.stroke();
 
+    // 서버에 그림 정보 전송
     ws.send(JSON.stringify({
       name: userName,
       location,
@@ -203,10 +231,52 @@ const Room = (props) => {
 
   // 마우스를 클릭할 때 호출되는 이벤트 핸들러
   const handleMouseDown = (e) => {
+    e.preventDefault();
+
+    if (!drawAuth) return;
+
+    const $canvas = refCanvas.current;
+    const context = $canvas.getContext('2d');
+
     if (ws.readyState !== ws.OPEN) return;
+
+    if (e.button === 2) {
+      context.lineWidth = 20
+    } else if (e.button === 0 && context.strokeStyle !== '#ffffff') {
+
+      context.lineWidth = 1
+    }
+
 
     // 그림 그리기 시작
     setIsDrawing(true)
+
+    // 현재 마우스 위치
+    const x = e.nativeEvent.offsetX;
+    const y = e.nativeEvent.offsetY;
+
+    // 이전 마우스 위치
+    const prevX = x;
+    const prevY = y;
+
+    // 이전 위치에서 현재 위치까지 선 그리기
+    context.beginPath();
+    context.moveTo(prevX, prevY);
+    context.lineTo(x, y);
+    context.stroke();
+
+    ws.send(JSON.stringify({
+      name: userName,
+      location,
+      request: 'draw',
+      data: {
+        weight: context.lineWidth,
+        prevX,
+        prevY,
+        x,
+        y,
+      }
+    }))
 
     // 현재 마우스 위치를 이전 위치로 초기화
     setPreCoord({
@@ -216,7 +286,16 @@ const Room = (props) => {
   };
 
   // 마우스 클릭을 놓을 때 호출되는 이벤트 핸들러
-  const handleMouseUp = () => {
+  const handleMouseUp = (e) => {
+    e.preventDefault();
+    console.log(e)
+
+    const $canvas = refCanvas.current;
+    const context = $canvas.getContext('2d');
+
+    if (e.button === 2 && context.strokeStyle !== '#ffffff') {
+      context.lineWidth = 1
+    }
 
     // 그림 그리기 종료
     // isDrawing = false;
@@ -226,6 +305,8 @@ const Room = (props) => {
   const handleMouseLeave = () => {
     setIsDrawing(false)
   }
+
+
 
   const exitRoom = () => {
     ws.send(JSON.stringify({
@@ -273,21 +354,61 @@ const Room = (props) => {
 
   const UserView = (props) => {
     const { player } = props;
-    return player
-      ? (
-        <div className='userWrap'>
-          <div className='user'>
-            <span>{player}</span>
-            <span>{information?.correct[player] ? information.correct[player] : 0}</span>
+    return (
+      <div className='userWrap'>
+        <div className='user'>
+          <div className='userNameArea'>
+            <div className='userNameTitle'>
+              닉네임
+            </div>
+            <div className='userName'>
+              {
+                player
+                  ? player
+                  : <></>
+              }
+            </div>
+          </div>
+          <div className='correctArea'>
+            {
+              player
+                ? '정답 ' + (information?.correct[player] ? information.correct[player] : 0) + '개'
+                : <></>
+            }
           </div>
         </div>
-      )
-      : (
-        <div className='userWrap'>
-          <div className='user'>
-          </div>
-        </div>
-      )
+      </div>
+    )
+  }
+
+  const setDrawColor = (color) => {
+    return () => {
+      const $canvas = refCanvas.current;
+      const context = $canvas.getContext('2d');
+
+      ws.send(JSON.stringify({
+        name: userName,
+        location,
+        request: 'changePaint',
+        data: color
+      }))
+
+      if (color === 'white') {
+        context.lineWidth = 20;
+
+      }
+      if (color === 'clear') {
+        ws.send(JSON.stringify({
+          name: userName,
+          location,
+          request: 'clear',
+        }))
+        context.clearRect(0, 0, $canvas.width, $canvas.height);
+
+      } else context.strokeStyle = color;
+
+
+    }
   }
 
   return (
@@ -300,23 +421,49 @@ const Room = (props) => {
 
           {
             information.roomMaster === userName
-              ? <button onClick={startGame}>시작하기</button>
+              ? <button className='bgBlue' onClick={startGame}>시작하기</button>
               : <></>
           }
-          <button onClick={exitRoom}>나가기</button>
+          <button className='bgRed' onClick={exitRoom}>나가기</button>
         </div>
-        <div className='timeArea'>
-          {timerTime > nowTime
-            ? timerTime - nowTime
-            : 0
-          }
-          {
-            information.round
-              ? information.round
-              : <></>
-          }
-        </div>
+        <div className='gameInfoArea'>
+          <div className='roundArea'>
+            <div className='roundTitle'>
+              Round
+            </div>
+            <div className='round'>
+              {
+                information.round
+                  ? information.round
+                  : <></>
+              }
+            </div>
+          </div>
+          <div className='timeArea'>
+            <div className='timeTitle'>
+              Time
+            </div>
+            <div className='time'>
+              <span>
+                {
+                  timerTime > nowTime
+                    ? String(Math.floor((timerTime - nowTime) / 1000 / 60)).padStart(2, '0')
+                    : '00'
+                }
+              </span>
+              <span>:</span>
+              <span>
+                {
+                  timerTime > nowTime
+                    ? (String(Math.floor((timerTime - nowTime) / 1000 % 60))).padStart(2, '0')
+                    : '00'
+                }
+              </span>
+            </div>
 
+          </div>
+
+        </div>
 
         {
           information?.game
@@ -330,8 +477,8 @@ const Room = (props) => {
       <div className='viewArea'>
         <div className='userArea1'>
           <UserView player={information?.roomMember[0]} />
-          <UserView player={information?.roomMember[1]} />
           <UserView player={information?.roomMember[2]} />
+          <UserView player={information?.roomMember[4]} />
         </div>
         <div className='canvasArea'>
           <div className='answerArea'>
@@ -343,22 +490,40 @@ const Room = (props) => {
             <canvas
               ref={refCanvas}
               width={450}
-              height={350}
+              height={280}
               onMouseMove={handleMouseMove}
               onMouseDown={handleMouseDown}
               onMouseUp={handleMouseUp}
               onMouseOut={handleMouseLeave}
+              onContextMenu={(e) => e.preventDefault()}
             />
           </div>
-
         </div>
         <div className='userArea2'>
+          <UserView player={information?.roomMember[1]} />
           <UserView player={information?.roomMember[3]} />
-          <UserView player={information?.roomMember[4]} />
           <UserView player={information?.roomMember[5]} />
         </div>
 
       </div>
+
+      <div className='canvasControlArea'>
+        <img src='/img/ink/black.png' onClick={setDrawColor('black')} />
+        <img src='/img/ink/red.png' onClick={setDrawColor('red')} />
+        <img src='/img/ink/orange.png' onClick={setDrawColor('orange')} />
+        <img src='/img/ink/yellow.png' onClick={setDrawColor('yellow')} />
+        <img src='/img/ink/green.png' onClick={setDrawColor('green')} />
+        <img src='/img/ink/purple.png' onClick={setDrawColor('purple')} />
+        {/* <button onClick={setDrawColor('red')} className='cRed'>🖋️</button>
+        <button onClick={setDrawColor('orange')} ><img src='img/ink/orange.png' /></button>
+        <button onClick={setDrawColor('yellow')} ><img src='/img/ink/yellow.png' /></button>
+        <button onClick={setDrawColor('green')} ><img src='/img/ink/green.png' /></button>
+        <button onClick={setDrawColor('blue')} ><img src='/img/ink/blue.png' /></button>
+        <button onClick={setDrawColor('purple')} ><img src='/img/ink/purple.png' /></button> */}
+        <button onClick={setDrawColor('white')} className='white'>🧽</button>
+        <button onClick={setDrawColor('clear')} className='clear'>♻️</button>
+      </div>
+
       <div className='chatArea' onClick={() => { refInput.current.focus(); }}>
         <div ref={refChat} className='chatView'>
           {

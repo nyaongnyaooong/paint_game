@@ -10,6 +10,10 @@ body {
   margin: 0;
 }
 
+button:hover {
+  cursor: pointer;
+}
+
 #root {
   width: 100%;
   height: 100%;
@@ -27,7 +31,7 @@ body {
 .room .controlArea {
   display: flex;
   justify-content: center;
-  height: 70px;
+  height: 80px;
 }
 .room .controlArea .logoArea {
   display: flex;
@@ -36,7 +40,7 @@ body {
   padding: 5px;
 }
 .room .controlArea .logoArea .logo {
-  width: 90px;
+  width: 110px;
   height: 100%;
   background-image: url("../img/logo.png");
   background-size: cover;
@@ -46,7 +50,6 @@ body {
   width: 450px;
   align-items: end;
   justify-content: end;
-  background-color: #d6a8e9;
 }
 .room .controlArea .buttonArea button {
   width: 80px;
@@ -54,15 +57,55 @@ body {
   font-weight: 900;
   margin: 1px;
   border: 0px;
+  color: white;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
 .room .controlArea .buttonArea button:hover {
   cursor: pointer;
 }
-.room .controlArea .timeArea {
-  background-color: aliceblue;
-  width: 170px;
+.room .controlArea .gameInfoArea {
+  display: flex;
+  margin: 10px;
+  width: 150px;
+  text-align: center;
+  vertical-align: middle;
+}
+.room .controlArea .gameInfoArea .roundArea {
+  background-color: azure;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  margin-right: 3px;
+}
+.room .controlArea .gameInfoArea .roundArea .roundTitle {
+  background-color: cornflowerblue;
+  color: azure;
+}
+.room .controlArea .gameInfoArea .roundArea .round {
+  font-size: 25px;
+}
+.room .controlArea .gameInfoArea .timeArea {
+  background-color: azure;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  margin-left: 3px;
+}
+.room .controlArea .gameInfoArea .timeArea .timeTitle {
+  background-color: darkcyan;
+  color: azure;
+}
+.room .controlArea .gameInfoArea .timeArea .time {
+  background-color: azure;
+  border-radius: 5px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 25px;
 }
 .room .viewArea {
   display: flex;
@@ -80,9 +123,25 @@ body {
   align-items: center;
 }
 .room .viewArea .userWrap .user {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   width: 120px;
   height: 80px;
-  background-color: white;
+  padding: 3px;
+  background-color: #b2afff;
+}
+.room .viewArea .userWrap .user .userNameArea {
+  background-color: cornflowerblue;
+}
+.room .viewArea .userWrap .user .userNameArea .userNameTitle {
+  font-size: 12px;
+}
+.room .viewArea .userWrap .user .correctArea {
+  color: white;
+}
+.room .viewArea .userWrap .user div {
+  text-align: center;
 }
 .room .viewArea .canvasArea {
   display: flex;
@@ -90,6 +149,9 @@ body {
   align-items: center;
 }
 .room .viewArea .canvasArea .answerArea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 450px;
   height: 30px;
   background-color: white;
@@ -97,14 +159,44 @@ body {
   border-radius: 5px;
   margin-top: 3px;
   margin-bottom: 3px;
-  text-align: center;
-  vertical-align: middle;
 }
 .room .viewArea .canvasArea .canvasWrap {
   text-align: center;
 }
 .room .viewArea .canvasArea .canvasWrap canvas {
   background-color: white;
+}
+.room .canvasControlArea {
+  display: flex;
+  justify-content: center;
+  background-color: rgba(240, 248, 255, 0.529);
+  width: 770px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.room .canvasControlArea img {
+  width: 35px;
+  margin: 10px;
+}
+.room .canvasControlArea img:hover {
+  filter: drop-shadow(0 0 10px white);
+}
+.room .canvasControlArea button {
+  width: 50px;
+  height: 50px;
+  margin: 10px;
+  border: 0px;
+  border-radius: 50%;
+  background-color: transparent;
+}
+.room .canvasControlArea button:hover {
+  filter: drop-shadow(0 0 10px white);
+}
+.room .canvasControlArea .white {
+  font-size: 30px;
+}
+.room .canvasControlArea .clear {
+  font-size: 30px;
 }
 .room .chatArea {
   display: flex;
@@ -183,21 +275,59 @@ body {
 }
 .lobby .headArea .logo {
   background-image: url("../img/lobby_logo.png");
-  background-size: auto;
-  background-position: -129px 0px;
-  width: 500px;
-  height: 290px;
+  background-size: cover;
+  background-position: -120px 0px;
+  width: 300px;
+  height: 180px;
 }
-.lobby .headArea .buttonArea {
+.lobby .headArea .rightArea {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  padding-top: 10px;
+  padding-right: 10px;
+}
+.lobby .headArea .rightArea .nameArea {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  margin-top: 15px;
+}
+.lobby .headArea .rightArea .nameArea .nameTitle {
+  width: 200px;
+  height: 30px;
+  background-color: mediumpurple;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding: 5px;
+  font-weight: 900;
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+}
+.lobby .headArea .rightArea .nameArea .nameWrap {
+  width: 200px;
+  height: 30px;
+  background-color: plum;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  padding: 5px;
+  font-size: 14px;
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+}
+.lobby .headArea .rightArea .buttonArea {
   display: flex;
   align-items: end;
   justify-content: end;
 }
-.lobby .headArea .buttonArea button {
-  width: 80px;
-  height: 30px;
-  font-weight: 900;
-  margin: 1px;
+.lobby .headArea .rightArea .buttonArea button {
+  width: 100px;
+  height: 40px;
+  color: white;
+  text-shadow: 0px 0px 3px black;
+  margin: 3px;
   border: 0px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
@@ -240,11 +370,99 @@ body {
 .lobby .roomList table tbody tr {
   border-top: 1px solid white;
 }
+.lobby .roomList table tbody tr:hover {
+  cursor: pointer;
+}
 .lobby .roomList table tbody tr td {
   text-align: center;
 }
 .lobby .roomList table tbody tr td.title {
   text-align: start;
+}
+
+.setName {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+.setName .titleArea {
+  border-radius: 5px;
+  font-size: 25px;
+  width: 300px;
+  padding: 10px;
+  margin: 10px;
+  text-align: center;
+}
+.setName .formArea {
+  display: flex;
+  flex-direction: column;
+}
+.setName .formArea .inputArea {
+  text-align: center;
+}
+.setName .formArea .inputArea input {
+  border-radius: 15px;
+  border: 0;
+  background-color: aliceblue;
+  width: 200px;
+  height: 35px;
+  padding: 5px;
+  padding-left: 10px;
+}
+.setName .formArea .inputArea input:focus {
+  outline: none;
+  border-color: blueviolet;
+  box-shadow: 0 0 5px blueviolet;
+}
+.setName .formArea .buttonArea {
+  display: flex;
+  justify-content: center;
+  width: 200px;
+  margin: 20px;
+  margin-bottom: 200px;
+}
+.setName .formArea .buttonArea button {
+  border: 0;
+  margin: 5px;
+  border-radius: 3px;
+  width: 80px;
+  height: 30px;
+  font-weight: 800;
+}
+.setName .formArea .buttonArea button:hover {
+  border-color: blueviolet;
+  box-shadow: 0 0 5px blueviolet;
+}
+.setName .formArea .buttonArea .cancel {
+  background-color: aliceblue;
+  color: grey;
+}
+.setName .formArea .buttonArea .confirm {
+  background-color: cornflowerblue;
+  color: white;
+}
+
+.bgRed {
+  background-color: crimson;
+}
+
+.bgYellow {
+  background-color: darkcyan;
+}
+
+.bgBlue {
+  background-color: deepskyblue;
+}
+
+.bgPink {
+  background-color: plum;
+}
+
+.bgGradBlue {
+  background: linear-gradient(rgb(95, 138, 255) 60%, #afbaff);
 }
 
 /*# sourceMappingURL=app.css.map */
